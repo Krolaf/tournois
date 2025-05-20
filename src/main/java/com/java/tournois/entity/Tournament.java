@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +29,15 @@ public abstract class Tournament {
     // Pour simplifier, on ne gère que le nom du jeu ici
     private String gameName;
     private Integer maxParticipants;
+    @Enumerated(EnumType.STRING)
+    private MatchFormat matchFormat;
+    private String rewards;
+    private LocalDateTime registrationStartDate;
+    private LocalDateTime registrationEndDate;
+    @ManyToOne
+    private Game game;
+    @ManyToOne
+    private GameMode gameMode;
 
     public Tournament() {}
 
@@ -43,4 +55,16 @@ public abstract class Tournament {
     public void setGameName(String gameName) { this.gameName = gameName; }
     public Integer getMaxParticipants() { return maxParticipants; }
     public void setMaxParticipants(Integer maxParticipants) { this.maxParticipants = maxParticipants; }
+    public MatchFormat getMatchFormat() { return matchFormat; }
+    public void setMatchFormat(MatchFormat matchFormat) { this.matchFormat = matchFormat; }
+    public String getRewards() { return rewards; }
+    public void setRewards(String rewards) { this.rewards = rewards; }
+    public LocalDateTime getRegistrationStartDate() { return registrationStartDate; }
+    public void setRegistrationStartDate(LocalDateTime registrationStartDate) { this.registrationStartDate = registrationStartDate; }
+    public LocalDateTime getRegistrationEndDate() { return registrationEndDate; }
+    public void setRegistrationEndDate(LocalDateTime registrationEndDate) { this.registrationEndDate = registrationEndDate; }
+    public Game getGame() { return game; }
+    public void setGame(Game game) { this.game = game; }
+    public GameMode getGameMode() { return gameMode; }
+    public void setGameMode(GameMode gameMode) { this.gameMode = gameMode; }
 } 
