@@ -16,5 +16,15 @@ public class Player {
     @OneToOne
     private User user;
     // Map<Game, PlayerStats> statistics à gérer plus tard
-    // Getters, setters, constructeurs
+
+    public Player() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getNickname() { return nickname; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
+    public Integer getEloRating() { return eloRating; }
+    public void setEloRating(Integer eloRating) { this.eloRating = eloRating; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 } 
