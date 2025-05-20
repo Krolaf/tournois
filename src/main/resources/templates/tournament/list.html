@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des tournois</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Accueil</a></li>
+        <li><a th:href="@{/tournament/create}">Créer un tournoi</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h1>Tournois</h1>
+    <table style="width:100%;margin-bottom:1em;">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Jeu</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Participants max</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="tournament : ${tournamentPage.content}">
+            <td th:text="${tournament.id}"></td>
+            <td th:text="${tournament.name}"></td>
+            <td th:text="${tournament.description}"></td>
+            <td th:text="${tournament.gameName}"></td>
+            <td th:text="${#temporals.format(tournament.startDate, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(tournament.endDate, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${tournament.maxParticipants}"></td>
+            <td>
+                <a th:href="@{'/tournament/edit/' + ${tournament.id}}">Éditer</a> |
+                <a th:href="@{'/tournament/delete/' + ${tournament.id}}" onclick="return confirm('Supprimer ce tournoi ?');">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>
+        <button th:if="${tournamentPage.hasPrevious()}" th:onclick="|window.location='@{/tournament/list(page=${tournamentPage.number - 1})}'|">&lt; Précédent</button>
+        <span>Page <span th:text="${tournamentPage.number + 1}"></span> / <span th:text="${tournamentPage.totalPages}"></span></span>
+        <button th:if="${tournamentPage.hasNext()}" th:onclick="|window.location='@{/tournament/list(page=${tournamentPage.number + 1})}'|">Suivant &gt;</button>
+    </div>
+</div>
+</body>
+</html> 

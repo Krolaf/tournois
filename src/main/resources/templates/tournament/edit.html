@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Éditer un tournoi</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Accueil</a></li>
+        <li><a th:href="@{/tournament/list}">Liste des tournois</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h1>Éditer un tournoi</h1>
+    <form th:action="@{'/tournament/edit/' + ${tournament.id}}" th:object="${tournament}" method="post">
+        <input type="text" th:field="*{name}" placeholder="Nom du tournoi" required />
+        <input type="text" th:field="*{description}" placeholder="Description" required />
+        <input type="text" th:field="*{gameName}" placeholder="Nom du jeu" required />
+        <input type="number" th:field="*{maxParticipants}" placeholder="Participants max" min="2" required />
+        <label>Date de début :</label>
+        <input type="datetime-local" th:field="*{startDate}" required />
+        <label>Date de fin :</label>
+        <input type="datetime-local" th:field="*{endDate}" required />
+        <button type="submit">Enregistrer</button>
+    </form>
+</div>
+</body>
+</html> 
