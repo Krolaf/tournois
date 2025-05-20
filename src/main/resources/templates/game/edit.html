@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Éditer un jeu</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Accueil</a></li>
+        <li><a th:href="@{/game/list}">Liste des jeux</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h1>Éditer un jeu</h1>
+    <form th:action="@{'/game/edit/' + ${game.id}}" th:object="${game}" method="post">
+        <input type="text" th:field="*{name}" placeholder="Nom du jeu" required />
+        <input type="text" th:field="*{description}" placeholder="Description" required />
+        <select th:field="*{format}" required>
+            <option th:each="format : ${formats}" th:value="${format}" th:text="${format}" th:selected="${format} == ${game.format}"></option>
+        </select>
+        <input type="number" th:field="*{averageMatchDuration}" placeholder="Durée moyenne (min)" min="1" required />
+        <button type="submit">Enregistrer</button>
+    </form>
+</div>
+</body>
+</html> 

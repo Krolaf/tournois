@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des jeux</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Accueil</a></li>
+        <li><a th:href="@{/game/create}">Créer un jeu</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h1>Jeux</h1>
+    <table style="width:100%;margin-bottom:1em;">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Format</th>
+            <th>Durée moyenne</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="game : ${gamePage.content}">
+            <td th:text="${game.id}"></td>
+            <td th:text="${game.name}"></td>
+            <td th:text="${game.description}"></td>
+            <td th:text="${game.format}"></td>
+            <td th:text="${game.averageMatchDuration}"></td>
+            <td>
+                <a th:href="@{'/game/edit/' + ${game.id}}">Éditer</a> |
+                <a th:href="@{'/game/delete/' + ${game.id}}" onclick="return confirm('Supprimer ce jeu ?');">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>
+        <button th:if="${gamePage.hasPrevious()}" th:onclick="|window.location='@{/game/list(page=${gamePage.number - 1})}'|">&lt; Précédent</button>
+        <span>Page <span th:text="${gamePage.number + 1}"></span> / <span th:text="${gamePage.totalPages}"></span></span>
+        <button th:if="${gamePage.hasNext()}" th:onclick="|window.location='@{/game/list(page=${gamePage.number + 1})}'|">Suivant &gt;</button>
+    </div>
+</div>
+</body>
+</html> 
