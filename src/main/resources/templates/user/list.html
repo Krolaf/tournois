@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des utilisateurs</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a th:href="@{/}">Accueil</a></li>
+        <li><a th:href="@{/user/create}">Créer un utilisateur</a></li>
+    </ul>
+</nav>
+<div class="container">
+    <h1>Utilisateurs</h1>
+    <table style="width:100%;margin-bottom:1em;">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom d'utilisateur</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${userPage.content}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.role}"></td>
+            <td>
+                <a th:href="@{'/user/edit/' + ${user.id}}">Éditer</a> |
+                <a th:href="@{'/user/delete/' + ${user.id}}" onclick="return confirm('Supprimer cet utilisateur ?');">Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>
+        <button th:if="${userPage.hasPrevious()}" th:onclick="|window.location='@{/user/list(page=${userPage.number - 1})}'|">&lt; Précédent</button>
+        <span>Page <span th:text="${userPage.number + 1}"></span> / <span th:text="${userPage.totalPages}"></span></span>
+        <button th:if="${userPage.hasNext()}" th:onclick="|window.location='@{/user/list(page=${userPage.number + 1})}'|">Suivant &gt;</button>
+    </div>
+</div>
+</body>
+</html> 
