@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Plateforme Tournois E-Sport</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a th:href="@{/user/create}">Créer un utilisateur</a></li>
+            <li><a th:href="@{/game/create}">Créer un jeu</a></li>
+            <li><a th:href="@{/tournament/create}">Créer un tournoi</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <h1>Bienvenue sur la plateforme de gestion de tournois e-sport</h1>
+        <p>Organisez, gérez et suivez vos compétitions facilement !</p>
+    </div>
+</body>
+</html> 
