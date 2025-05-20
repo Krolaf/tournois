@@ -22,9 +22,9 @@
 </nav>
 <div class="container">
     <h1>Créer un tournoi</h1>
-    <form th:action="@{/tournament/create}" th:object="${tournament}" method="post">
+    <form th:action="@{/tournament/create}" th:object="${tournamentForm}" method="post">
         <label>Type de tournoi :</label>
-        <select id="tournamentType" name="tournamentType" onchange="showSpecificFields()" required>
+        <select id="tournamentType" th:field="*{tournamentType}" onchange="showSpecificFields()" required>
             <option th:each="type : ${tournamentTypes}" th:value="${type}" th:text="${type}"></option>
         </select>
         <input type="text" th:field="*{name}" placeholder="Nom du tournoi" required />

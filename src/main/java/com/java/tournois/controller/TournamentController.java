@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.java.tournois.dto.TournamentForm;
 import com.java.tournois.entity.DoubleEliminationTournament;
 import com.java.tournois.entity.MatchFormat;
 import com.java.tournois.entity.RoundRobinTournament;
@@ -45,39 +46,42 @@ public class TournamentController {
         model.addAttribute("matchFormats", MatchFormat.values());
         model.addAttribute("games", gameService.getAllGames(0, Integer.MAX_VALUE).getContent());
         model.addAttribute("gameModes", gameModeService.getAllGameModes());
-        model.addAttribute("tournament", new SingleEliminationTournament());
+        model.addAttribute("tournamentForm", new TournamentForm());
         return "tournament/create";
     }
 
     @PostMapping("/create")
-    public String createTournament(@RequestParam String tournamentType, @ModelAttribute Tournament tournament) {
+    public String createTournament(@ModelAttribute TournamentForm form) {
         Tournament t;
-        switch (tournamentType) {
-            case "DOUBLE_ELIMINATION" -> t = new DoubleEliminationTournament();
-            case "ROUND_ROBIN" -> t = new RoundRobinTournament();
-            default -> t = new SingleEliminationTournament();
+        switch (form.getTournamentType()) {
+            case "DOUBLE_ELIMINATION" -> {
+                DoubleEliminationTournament d = new DoubleEliminationTournament();
+                d.setHasConsolationFinal(form.getHasConsolationFinal());
+                t = d;
+            }
+            case "ROUND_ROBIN" -> {
+                RoundRobinTournament r = new RoundRobinTournament();
+                r.setNumberOfRounds(form.getNumberOfRounds());
+                r.setHomeAndAway(form.getHomeAndAway());
+                t = r;
+            }
+            default -> {
+                SingleEliminationTournament s = new SingleEliminationTournament();
+                s.setHasThirdPlaceMatch(form.getHasThirdPlaceMatch());
+                t = s;
+            }
         }
-        // Copier les propriétés communes
-        t.setName(tournament.getName());
-        t.setDescription(tournament.getDescription());
-        t.setStartDate(tournament.getStartDate());
-        t.setEndDate(tournament.getEndDate());
-        t.setMaxParticipants(tournament.getMaxParticipants());
-        t.setMatchFormat(tournament.getMatchFormat());
-        t.setRewards(tournament.getRewards());
-        t.setRegistrationStartDate(tournament.getRegistrationStartDate());
-        t.setRegistrationEndDate(tournament.getRegistrationEndDate());
-        t.setGame(tournament.getGame());
-        t.setGameMode(tournament.getGameMode());
-        // Champs spécifiques
-        if (t instanceof SingleEliminationTournament s) {
-            ((SingleEliminationTournament) t).setHasThirdPlaceMatch(((SingleEliminationTournament) tournament).getHasThirdPlaceMatch());
-        } else if (t instanceof DoubleEliminationTournament d) {
-            ((DoubleEliminationTournament) t).setHasConsolationFinal(((DoubleEliminationTournament) tournament).getHasConsolationFinal());
-        } else if (t instanceof RoundRobinTournament r) {
-            ((RoundRobinTournament) t).setNumberOfRounds(((RoundRobinTournament) tournament).getNumberOfRounds());
-            ((RoundRobinTournament) t).setHomeAndAway(((RoundRobinTournament) tournament).getHomeAndAway());
-        }
+        t.setName(form.getName());
+        t.setDescription(form.getDescription());
+        t.setStartDate(form.getStartDate());
+        t.setEndDate(form.getEndDate());
+        t.setMaxParticipants(form.getMaxParticipants());
+        t.setMatchFormat(form.getMatchFormat());
+        t.setRewards(form.getRewards());
+        t.setRegistrationStartDate(form.getRegistrationStartDate());
+        t.setRegistrationEndDate(form.getRegistrationEndDate());
+        t.setGame(gameService.getGameById(form.getGame()).orElse(null));
+        t.setGameMode(gameModeService.getAllGameModes().stream().filter(m -> m.getId().equals(form.getGameMode())).findFirst().orElse(null));
         tournamentService.saveTournament(t);
         return "redirect:/tournament/list";
     }
@@ -85,18 +89,62 @@ public class TournamentController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Tournament tournament = tournamentService.getTournamentById(id).orElseThrow();
+        TournamentForm form = new TournamentForm();
+        if (tournament instanceof SingleEliminationTournament s) {
+            form.setTournamentType("SINGLE_ELIMINATION");
+            form.setHasThirdPlaceMatch(s.getHasThirdPlaceMatch());
+        } else if (tournament instanceof DoubleEliminationTournament d) {
+            form.setTournamentType("DOUBLE_ELIMINATION");
+            form.setHasConsolationFinal(d.getHasConsolationFinal());
+        } else if (tournament instanceof RoundRobinTournament r) {
+            form.setTournamentType("ROUND_ROBIN");
+            form.setNumberOfRounds(r.getNumberOfRounds());
+            form.setHomeAndAway(r.getHomeAndAway());
+        }
+        form.setName(tournament.getName());
+        form.setDescription(tournament.getDescription());
+        form.setStartDate(tournament.getStartDate());
+        form.setEndDate(tournament.getEndDate());
+        form.setMaxParticipants(tournament.getMaxParticipants());
+        form.setMatchFormat(tournament.getMatchFormat());
+        form.setRewards(tournament.getRewards());
+        form.setRegistrationStartDate(tournament.getRegistrationStartDate());
+        form.setRegistrationEndDate(tournament.getRegistrationEndDate());
+        form.setGame(tournament.getGame() != null ? tournament.getGame().getId() : null);
+        form.setGameMode(tournament.getGameMode() != null ? tournament.getGameMode().getId() : null);
         model.addAttribute("tournamentTypes", List.of("SINGLE_ELIMINATION", "DOUBLE_ELIMINATION", "ROUND_ROBIN"));
         model.addAttribute("matchFormats", MatchFormat.values());
         model.addAttribute("games", gameService.getAllGames(0, Integer.MAX_VALUE).getContent());
         model.addAttribute("gameModes", gameModeService.getAllGameModes());
-        model.addAttribute("tournament", tournament);
+        model.addAttribute("tournamentForm", form);
+        model.addAttribute("tournamentId", id);
         return "tournament/edit";
     }
 
     @PostMapping("/edit/{id}")
-    public String editTournament(@PathVariable Long id, @RequestParam String tournamentType, @ModelAttribute Tournament tournament) {
-        tournament.setId(id);
-        return createTournament(tournamentType, tournament);
+    public String editTournament(@PathVariable Long id, @ModelAttribute TournamentForm form) {
+        Tournament t = tournamentService.getTournamentById(id).orElseThrow();
+        if (t instanceof SingleEliminationTournament s) {
+            s.setHasThirdPlaceMatch(form.getHasThirdPlaceMatch());
+        } else if (t instanceof DoubleEliminationTournament d) {
+            d.setHasConsolationFinal(form.getHasConsolationFinal());
+        } else if (t instanceof RoundRobinTournament r) {
+            r.setNumberOfRounds(form.getNumberOfRounds());
+            r.setHomeAndAway(form.getHomeAndAway());
+        }
+        t.setName(form.getName());
+        t.setDescription(form.getDescription());
+        t.setStartDate(form.getStartDate());
+        t.setEndDate(form.getEndDate());
+        t.setMaxParticipants(form.getMaxParticipants());
+        t.setMatchFormat(form.getMatchFormat());
+        t.setRewards(form.getRewards());
+        t.setRegistrationStartDate(form.getRegistrationStartDate());
+        t.setRegistrationEndDate(form.getRegistrationEndDate());
+        t.setGame(gameService.getGameById(form.getGame()).orElse(null));
+        t.setGameMode(gameModeService.getAllGameModes().stream().filter(m -> m.getId().equals(form.getGameMode())).findFirst().orElse(null));
+        tournamentService.saveTournament(t);
+        return "redirect:/tournament/list";
     }
 
     @GetMapping("/delete/{id}")

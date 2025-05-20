@@ -4,8 +4,16 @@
     <meta charset="UTF-8">
     <title>Éditer un tournoi</title>
     <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <script>
+        function showSpecificFields() {
+            const type = document.getElementById('tournamentType').value;
+            document.getElementById('singleFields').style.display = (type === 'SINGLE_ELIMINATION') ? 'block' : 'none';
+            document.getElementById('doubleFields').style.display = (type === 'DOUBLE_ELIMINATION') ? 'block' : 'none';
+            document.getElementById('roundRobinFields').style.display = (type === 'ROUND_ROBIN') ? 'block' : 'none';
+        }
+    </script>
 </head>
-<body>
+<body onload="showSpecificFields()">
 <nav>
     <ul>
         <li><a th:href="@{/}">Accueil</a></li>
@@ -14,15 +22,58 @@
 </nav>
 <div class="container">
     <h1>Éditer un tournoi</h1>
-    <form th:action="@{'/tournament/edit/' + ${tournament.id}}" th:object="${tournament}" method="post">
+    <form th:action="@{'/tournament/edit/' + ${tournamentId}}" th:object="${tournamentForm}" method="post">
+        <label>Type de tournoi :</label>
+        <select id="tournamentType" th:field="*{tournamentType}" onchange="showSpecificFields()" required>
+            <option th:each="type : ${tournamentTypes}" th:value="${type}" th:text="${type}"></option>
+        </select>
         <input type="text" th:field="*{name}" placeholder="Nom du tournoi" required />
         <input type="text" th:field="*{description}" placeholder="Description" required />
-        <input type="text" th:field="*{gameName}" placeholder="Nom du jeu" required />
+        <label>Jeu :</label>
+        <select th:field="*{game}" required>
+            <option th:each="game : ${games}" th:value="${game.id}" th:text="${game.name}"></option>
+        </select>
+        <label>Mode de jeu :</label>
+        <select th:field="*{gameMode}" required>
+            <option th:each="mode : ${gameModes}" th:value="${mode.id}" th:text="${mode.name}"></option>
+        </select>
         <input type="number" th:field="*{maxParticipants}" placeholder="Participants max" min="2" required />
+        <label>Format du match :</label>
+        <select th:field="*{matchFormat}" required>
+            <option th:each="format : ${matchFormats}" th:value="${format}" th:text="${format}"></option>
+        </select>
+        <input type="text" th:field="*{rewards}" placeholder="Prix et récompenses" />
+        <label>Date d'inscription (début) :</label>
+        <input type="datetime-local" th:field="*{registrationStartDate}" required />
+        <label>Date d'inscription (fin) :</label>
+        <input type="datetime-local" th:field="*{registrationEndDate}" required />
         <label>Date de début :</label>
         <input type="datetime-local" th:field="*{startDate}" required />
         <label>Date de fin :</label>
         <input type="datetime-local" th:field="*{endDate}" required />
+        <div id="singleFields" style="display:none">
+            <label>Match pour la 3e place :</label>
+            <select th:field="*{hasThirdPlaceMatch}">
+                <option th:value="true">Oui</option>
+                <option th:value="false">Non</option>
+            </select>
+        </div>
+        <div id="doubleFields" style="display:none">
+            <label>Finale de consolation :</label>
+            <select th:field="*{hasConsolationFinal}">
+                <option th:value="true">Oui</option>
+                <option th:value="false">Non</option>
+            </select>
+        </div>
+        <div id="roundRobinFields" style="display:none">
+            <label>Nombre de tours :</label>
+            <input type="number" th:field="*{numberOfRounds}" min="1" />
+            <label>Aller-retour :</label>
+            <select th:field="*{homeAndAway}">
+                <option th:value="true">Oui</option>
+                <option th:value="false">Non</option>
+            </select>
+        </div>
         <button type="submit">Enregistrer</button>
     </form>
 </div>
